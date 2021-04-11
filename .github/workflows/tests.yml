@@ -48,6 +48,7 @@ jobs:
       - name: Install tests’ requirements
         run: |
           echo "TEMP=$env:C:\Users\runneradmin\AppData\Local\Temp" >> $env:GITHUB_ENV
+          echo "TMP=$env:C:\Users\runneradmin\AppData\Local\Temp" >> $env:GITHUB_ENV
           python -m pip -v install .[test]
       - name: Launch tests
         run: python -m pytest
