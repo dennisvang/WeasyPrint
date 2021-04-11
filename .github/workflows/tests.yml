@@ -39,6 +39,8 @@ jobs:
           C:\msys64\usr\bin\bash -lc 'pacman -S mingw-w64-x86_64-ttf-dejavu mingw-w64-x86_64-pango mingw-w64-x86_64-ghostscript --noconfirm'
           xcopy "C:\msys64\mingw64\share\fonts\TTF" "C:\Users\runneradmin\.fonts" /e /i
           echo "C:\msys64\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH
+          echo "TEMP=C:\Users\runneradmin\AppData\Local\Temp" >> $GITHUB_ENV
+          echo "TMP=C:\Users\runneradmin\AppData\Local\Temp" >> $GITHUB_ENV
           rm C:\msys64\mingw64\bin\python.exe
       - name: Upgrade pip and setuptools
         run: python -m pip install --upgrade pip setuptools
@@ -46,9 +48,6 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: python -m pip install --upgrade cffi
       - name: Install tests’ requirements
-        run: |
-          echo "TEMP=$env:C:\Users\runneradmin\AppData\Local\Temp" >> $env:GITHUB_ENV
-          echo "TMP=$env:C:\Users\runneradmin\AppData\Local\Temp" >> $env:GITHUB_ENV
-          python -m pip -v install .[test]
+        run: python -m pip -v install .[test]
       - name: Launch tests
         run: python -m pytest
