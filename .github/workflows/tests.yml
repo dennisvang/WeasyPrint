@@ -46,6 +46,8 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: python -m pip install --upgrade cffi
       - name: Install tests’ requirements
-        run: python -m pip -v install .[test]
+        run: |
+          echo "TEMP=$env:USERPROFILE\AppData\Local\Temp" >> $env:GITHUB_ENV
+          python -m pip -v install .[test]
       - name: Launch tests
         run: python -m pytest
