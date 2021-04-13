@@ -13,8 +13,9 @@ from .. import computed_values
 from ..properties import KNOWN_PROPERTIES, Dimension
 from ..utils import (
     InvalidValues, check_var_function, comma_separated_list, get_angle,
-    get_content_list, get_content_list_token, get_custom_ident, get_image,
-    get_keyword, get_length, get_resolution, get_single_keyword, get_url,
+    get_auto_track_list, get_content_list, get_content_list_token,
+    get_custom_ident, get_grid_line, get_image, get_keyword, get_length,
+    get_resolution, get_single_keyword, get_track_list, get_url,
     parse_2d_position, parse_function, parse_position, remove_whitespace,
     single_keyword, single_token)
 
@@ -1492,3 +1493,36 @@ def transform(tokens):
             else:
                 return
         return tuple(transforms)
+
+
+def temp_print_tokens(tokens):
+    # TODO: remove this when done
+    for token in tokens:
+        print(f'{token} ' + ', '.join(
+            f'{attr}: {getattr(token, attr, None)}'
+            for attr in ['type', 'value', 'unit']))
+
+
+@property('grid-template-rows')
+@property('grid-template-columns')
+def grid_template_rows_columns(tokens):
+    """ validation for ``grid-template-rows`` and ``grid-template-columns`` """
+    # https://www.w3.org/TR/css-grid-1/#track-sizing
+    # none | <track-list> | <auto-track-list>
+    temp_print_tokens(tokens)
+    if len(tokens) == 1:
+        keyword = get_keyword(tokens[0])
+        if keyword == 'none':
+            return keyword, keyword  # todo: again, not sure what to return
+    elif len(tokens) > 1:
+        return get_track_list(tokens) or get_auto_track_list(tokens)
+
+
+@property('grid-row-start')
+@property('grid-column-start')
+@property('grid-row-end')
+@property('grid-column-end')
+def grid_row_column_start(tokens):
+    """ validation for ``grid-row-start`` and ``grid-column-start`` """
+    # https://www.w3.org/TR/css-grid-1/#line-placement
+    return get_grid_line(tokens)

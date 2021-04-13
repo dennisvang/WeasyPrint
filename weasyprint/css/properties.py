@@ -201,6 +201,14 @@ INITIAL_VALUES = {
     'list_style_position': 'outside',
     'list_style_type': 'disc',
 
+    # CSS Grid Layout Module Level 1 (CR): https://www.w3.org/TR/css-grid-1/
+    'grid-template-columns': 'none',
+    'grid-template-rows': 'none',
+    'grid-row-start': 'auto',
+    'grid-column-start': 'auto',
+    'grid-row-end': 'auto',
+    'grid-column-end': 'auto',
+
     # Proprietary
     'anchor': None,  # computed value of 'none'
     'link': None,  # computed value of 'none'

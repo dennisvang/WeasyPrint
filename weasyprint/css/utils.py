@@ -47,6 +47,10 @@ RESOLUTION_TO_DPPX = {
 # Sets of possible length units
 LENGTH_UNITS = set(LENGTHS_TO_PIXELS) | set(['ex', 'em', 'ch', 'rem'])
 
+# https://www.w3.org/TR/css-grid-1/#typedef-flex
+# "Note: <flex> values are not <length>s ..."
+FLEX_UNITS = {'fr'}  # only one unit, but we do this for consistency with length
+
 # Constants about background positions
 ZERO_PERCENT = Dimension(0, '%')
 FIFTY_PERCENT = Dimension(50, '%')
@@ -757,3 +761,104 @@ def get_content_list_token(token, base_url):
     # <element()>
     elif name == 'element':
         return check_string_or_element_function('element', token)
+
+
+def get_flex(token):
+    """ Parse a <flex> token """
+    if token.type == 'dimension' and token.unit in FLEX_UNITS:
+        if token.value >= 0:
+            return Dimension(token.value, token.unit)
+
+
+def get_integer(token):
+    """ Parse an <integer> token """
+    if token.type == 'number' and token.is_integer:
+        return token.int_value
+
+
+def get_grid_line(tokens):
+    """
+    Parse a <grid-line> token
+
+    <grid-line> =
+      auto |
+      <custom-ident> |
+      [ <integer> && <custom-ident>? ] |
+      [ span && [ <integer> || <custom-ident> ] ]
+
+    syntax:
+    https://www.w3.org/TR/css-grid-1/#typedef-grid-row-start-grid-line
+    https://www.w3.org/TR/css-values-4/#value-defs
+
+    examples:
+    https://developer.mozilla.org/en-US/docs/Web/CSS/grid-column-start#syntax
+    """
+    if len(tokens) == 1:
+        # must be either 'auto' or <custom-ident> or <integer>
+        token = tokens[0]
+        keyword = get_keyword(token)
+        if keyword == 'auto':
+            return keyword, keyword
+        custom_ident = get_custom_ident(token)
+        if custom_ident:
+            return custom_ident, custom_ident  # todo: not sure what to return... tuple(name, value)?
+        integer = get_integer(token)
+        if integer is not None:
+            return integer, integer
+    if 1 < len(tokens) <= 3:
+        # must be either <integer> + <custom-ident>
+        # or any of 'span' + <integer>, 'span' + <custom-ident>,
+        # or 'span' + <integer> + <custom-ident> (in any order)
+        valid_tokens = dict()
+        for token in tokens:
+            keyword = get_keyword(token)
+            if keyword == 'span':
+                valid_tokens[keyword] = keyword
+            integer = get_integer(token)
+            if integer is not None:
+                valid_tokens['integer'] = integer
+            custom_ident = get_custom_ident(token)
+            if custom_ident:
+                valid_tokens['custom_ident'] = custom_ident
+        if set(valid_tokens.keys()) in [
+                {'integer', 'custom_ident'}, {'span', 'integer'},
+                {'span', 'custom_ident'}, {'span', 'integer', 'custom_ident'}]:
+            return tuple(valid_tokens.values())
+
+
+def get_line_names(tokens):
+    ...
+
+
+def get_fixed_breadth(token):
+    ...
+
+
+def get_inflexible_breadth(token):
+    ...
+
+
+def get_track_breadth(token):
+    ...
+
+
+def fixed_size(token):
+    ...
+
+
+def track_size(token):
+    ...
+
+def get_track_list(tokens):
+    # https://www.w3.org/TR/css-grid-1/#typedef-track-list
+    # <track-list> =
+    #   [ <line-names>? [ <track-size> | <track-repeat> ] ]+ <line-names>?
+    ...
+
+
+def get_auto_track_list(tokens):
+    # https://www.w3.org/TR/css-grid-1/#typedef-auto-track-list
+    # <auto-track-list> =
+    #   [ <line-names>? [ <fixed-size> | <fixed-repeat> ] ]* <line-names>? <auto-repeat>
+    #                         [ <line-names>? [ <fixed-size> | <fixed-repeat> ] ]* <line-names>?
+    ...
