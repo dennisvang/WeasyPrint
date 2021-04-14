@@ -1522,7 +1522,10 @@ def grid_template_rows_columns(tokens):
 @property('grid-column-start')
 @property('grid-row-end')
 @property('grid-column-end')
-def grid_row_column_start(tokens):
-    """ validation for ``grid-row-start`` and ``grid-column-start`` """
+def grid_row_column_start_end(tokens):
+    """
+    validation for ``grid-row-start``, ``grid-column-start``, ``grid-row-end``,
+    and ``grid-column-end``
+    """
     # https://www.w3.org/TR/css-grid-1/#line-placement
     return get_grid_line(tokens)
